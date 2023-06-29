@@ -5,8 +5,12 @@ export const initialState = {
 };
 
 export const handleNumber = (value, state) => {
-  if (state.currentValue === "0") {
-    return { currentValue: `${value}` };
+  if (state.currentValue === "0" || state.operator === "=") {
+    return {
+      currentValue: `${value}`,
+      operator: null,
+      previousValue: null,
+    };
   }
 
   return {
@@ -16,6 +20,10 @@ export const handleNumber = (value, state) => {
 
 const handleEqual = (state) => {
   const { currentValue, previousValue, operator } = state;
+
+  if (!previousValue || !operator) {
+    return state;
+  }
 
   const current = parseFloat(currentValue);
   const previous = parseFloat(previousValue);
@@ -42,13 +50,11 @@ const handleEqual = (state) => {
         currentValue: `${previous / current}`,
         ...resetState,
       };
-
     default:
       return state;
   }
 };
 
-// calculator function
 const calculator = (type, value, state) => {
   switch (type) {
     case "number":
@@ -65,7 +71,7 @@ const calculator = (type, value, state) => {
       };
     case "operator":
       return {
-        operator: value,
+        operator: value ? value : state.operator,
         previousValue: state.currentValue,
         currentValue: "0",
       };
